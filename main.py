@@ -8,40 +8,57 @@ from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium.webdriver.common.by import By
 
 reference_products = []
-product_description = []
-product_prices = []
-availabilities = []
-images_sources = []
+descriptions = []
+prices = []
+stocks = []
+offres = []
+marques = []
+images = []
 
 try:
-    url = "https://www.tunisianet.com.tn/596-smartphone-mobile-4g-tunisie"
+    url = "https://www.tunisianet.com.tn/301-pc-portable-tunisie"
     driver = webdriver.Firefox(executable_path=r'/home/hosni/Downloads/geckodriver/geckodriver')
     driver.get(url)
-    reference_product = driver.find_elements_by_class_name("product-reference")
-    description_product = driver.find_elements_by_class_name("product-short-description")
-    price_product = driver.find_elements_by_class_name("price")
-    availability = driver.find_elements_by_class_name("in-stock")
-    image_sources = driver.find_elements(By.TAG_NAME, "img")
-    for i in image_sources:
-        images_sources.append(i.get_attribute("alt"))
+    driver.fullscreen_window()
+    reference_product = driver.find_elements(By.XPATH, "//article/div/h2/a")
+    desc = driver.find_elements(By.XPATH, "//div/div/a/p")
+    price = driver.find_elements(By.CLASS_NAME, "price")
+    stock = driver.find_elements(By.XPATH, "//article/div/div/div/span")
+    offre = driver.find_elements(By.XPATH, "//article/div/div/a/p/span/strong")
+    marque = driver.find_elements(By.XPATH, "//article/div/div/div/a/img")
+    image = driver.find_elements(By.XPATH, "//article/div/a/img")
+    for i in image:
+        images.append(i.get_attribute("data-full-size-image-url"))
+    for i in marque:
+        marques.append(i.get_attribute("alt"))
+    for i in offre:
+        offres.append(i.text)
+    for i in stock:
+        stocks.append(i.text)
+    for i in price:
+        prices.append(i.text)
     for i in reference_product:
         reference_products.append(i.text)
-    for j in description_product:
-        product_description.append(j.text)
-    for k in price_product:
-        product_prices.append(k.text)
-    for l in availability:
-        availabilities.append(l.text)
+    for i in desc:
+        descriptions.append(i.text)
+
 except Exception as e:
     pass
 
 print("Reference_Products", len(reference_products))
-print("Product_Description", len(product_description))
-print("Product_Price", len(product_prices))
-print("Disponibility", len(availabilities))
+print("Description", len(descriptions))
+print("Prices", len(prices))
+print("Availability", len(stocks))
+print("Marque", len(marques))
+print("Offre", len(offres))
+print("Image_Url", len(images))
+
 s1 = pd.Series(reference_products, name='Reference_Product')
-s2 = pd.Series(product_description, name='Product_Desciption')
-s3 = pd.Series(product_prices, name="Product_Price")
-s4 = pd.Series(availabilities, name="Disponibility")
-df = pd.concat([s1, s2, s3, s4], axis=1)
+s2 = pd.Series(descriptions, name='Description')
+s3 = pd.Series(prices, name='Price')
+s31 = pd.Series(stocks, name='Availability')
+s4 = pd.Series(marques, name='Marque')
+s5 = pd.Series(offres, name='Offre')
+s6 = pd.Series(images, name='Image_URL')
+df = pd.concat([s1, s2, s3, s31, s4, s5, s6], axis=1)
 df.to_csv("Tunisianet_Smatphone.csv")
